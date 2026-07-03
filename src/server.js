@@ -1,5 +1,25 @@
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '../.env') });
+const dotenv = require('dotenv');
+
+// Load environment variables from .env file (for local development)
+// In production (Render), environment variables are set in the dashboard
+dotenv.config({ path: path.join(__dirname, '../.env') });
+
+// Validate required environment variables
+const requiredEnvVars = ['MONGODB_URI', 'JWT_SECRET'];
+const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
+
+if (missingEnvVars.length > 0) {
+  console.error('❌ Missing required environment variables:');
+  missingEnvVars.forEach(varName => {
+    console.error(`   - ${varName}`);
+  });
+  console.error('\nPlease set these environment variables:');
+  console.error('- For local development: Add them to backend-node/.env file');
+  console.error('- For production (Render): Set them in the Render dashboard under Environment tab');
+  process.exit(1);
+}
+
 const app = require('./app');
 const connectDB = require('./config/database');
 

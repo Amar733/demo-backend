@@ -22,6 +22,7 @@ const sendTokenResponse = (user, statusCode, res) => {
       user: {
         id: user._id,
         name: user.name,
+        mobile: user.mobile,
         email: user.email,
         role: user.role
       }
@@ -33,17 +34,18 @@ const sendTokenResponse = (user, statusCode, res) => {
 // @route   POST /api/auth/register
 // @access  Public
 exports.register = catchAsync(async (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { name, mobile, email, password } = req.body;
 
-  // Check if user already exists
-  const existingUser = await User.findOne({ email });
+  // Check if user already exists with this mobile number
+  const existingUser = await User.findOne({ mobile });
   if (existingUser) {
-    return next(new ErrorResponse('User already exists with this email', 400));
+    return next(new ErrorResponse('User already exists with this mobile number', 400));
   }
 
   // Create user
   const user = await User.create({
     name,
+    mobile,
     email,
     password
   });
@@ -55,20 +57,20 @@ exports.register = catchAsync(async (req, res, next) => {
 // @route   POST /api/auth/login
 // @access  Public
 exports.login = catchAsync(async (req, res, next) => {
-  const { email, password } = req.body;
+  const { mobile, password } = req.body;
 
   // Get user with password
-  const user = await User.findOne({ email }).select('+password');
+  const user = await User.findOne({ mobile }).select('+password');
 
   if (!user) {
-    return next(new ErrorResponse('Invalid email or password', 401));
+    return next(new ErrorResponse('Invalid mobile number or password', 401));
   }
 
   // Check if password matches
   const isMatch = await user.comparePassword(password);
 
   if (!isMatch) {
-    return next(new ErrorResponse('Invalid email or password', 401));
+    return next(new ErrorResponse('Invalid mobile number or password', 401));
   }
 
   if (!user.isActive) {

@@ -15,15 +15,16 @@ exports.validate = (req, res, next) => {
 exports.registerValidation = [
   body('name').trim().notEmpty().withMessage('Name is required')
     .isLength({ max: 50 }).withMessage('Name cannot exceed 50 characters'),
-  body('email').trim().notEmpty().withMessage('Email is required')
-    .isEmail().withMessage('Please provide a valid email'),
+  body('mobile').trim().notEmpty().withMessage('Mobile number is required')
+    .matches(/^[0-9]{10}$/).withMessage('Please provide a valid 10-digit mobile number'),
+  body('email').optional().trim().isEmail().withMessage('Please provide a valid email'),
   body('password').trim().notEmpty().withMessage('Password is required')
     .isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
 ];
 
 exports.loginValidation = [
-  body('email').trim().notEmpty().withMessage('Email is required')
-    .isEmail().withMessage('Please provide a valid email'),
+  body('mobile').trim().notEmpty().withMessage('Mobile number is required')
+    .matches(/^[0-9]{10}$/).withMessage('Please provide a valid 10-digit mobile number'),
   body('password').trim().notEmpty().withMessage('Password is required'),
 ];
 

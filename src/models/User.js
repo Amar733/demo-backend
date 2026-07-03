@@ -9,18 +9,18 @@ const UserSchema = new mongoose.Schema({
     trim: true,
     maxlength: [50, 'Name cannot be more than 50 characters']
   },
-  email: {
-    type: String,
-    required: [true, 'Please provide an email'],
-    unique: true,
-    lowercase: true,
-    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email']
-  },
   mobile: {
+    type: String,
+    required: [true, 'Please provide a mobile number'],
+    unique: true,
+    match: [/^[0-9]{10}$/, 'Please provide a valid 10-digit mobile number']
+  },
+  email: {
     type: String,
     unique: true,
     sparse: true,
-    match: [/^[0-9]{10}$/, 'Please provide a valid 10-digit mobile number']
+    lowercase: true,
+    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email']
   },
   password: {
     type: String,
@@ -77,7 +77,7 @@ UserSchema.methods.comparePassword = async function(enteredPassword) {
 // Generate JWT token
 UserSchema.methods.generateToken = function() {
   return jwt.sign(
-    { id: this._id, email: this.email, role: this.role },
+    { id: this._id, mobile: this.mobile, email: this.email, role: this.role },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRE }
   );
