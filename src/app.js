@@ -19,34 +19,14 @@ const app = express();
 // Security middleware
 app.use(helmet());
 
-// CORS configuration
-const allowedOrigins = process.env.CLIENT_URL 
-  ? process.env.CLIENT_URL.split(',').map(url => url.trim())
-  : ['http://localhost:3000'];
-
+// CORS configuration - Allow all origins in production for now
 app.use(cors({
-  origin: function(origin, callback) {
-    // Allow requests with no origin (mobile apps, Postman, etc.)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    
-    // In production, log unauthorized origins but don't crash
-    if (process.env.NODE_ENV === 'production') {
-      console.warn(`⚠️  CORS request from unauthorized origin: ${origin}`);
-      return callback(null, false);
-    }
-    
-    // In development, be more permissive
-    callback(null, true);
-  },
+  origin: true, // Allow all origins
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
   exposedHeaders: ['Content-Range', 'X-Content-Range'],
-  maxAge: 600 // Cache preflight for 10 minutes
+  maxAge: 86400 // Cache preflight for 24 hours
 }));
 
 // Rate limiting
