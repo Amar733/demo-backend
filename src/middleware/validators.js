@@ -17,9 +17,9 @@ exports.registerValidation = [
     .isLength({ max: 50 }).withMessage('Name cannot exceed 50 characters'),
   body('mobile').trim().notEmpty().withMessage('Mobile number is required')
     .matches(/^[0-9]{10}$/).withMessage('Please provide a valid 10-digit mobile number'),
-  body('email').optional().trim().isEmail().withMessage('Please provide a valid email'),
-  body('password').trim().notEmpty().withMessage('Password is required')
-    .isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+  body('email').optional({ values: 'falsy' }).trim().isEmail().withMessage('Please provide a valid email'),
+  // body('password').trim().notEmpty().withMessage('Password is required')
+    // .isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
 ];
 
 exports.loginValidation = [
