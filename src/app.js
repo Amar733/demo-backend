@@ -30,12 +30,23 @@ app.use(cors({
     if (!origin) return callback(null, true);
     
     if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+      return callback(null, true);
     }
+    
+    // In production, log unauthorized origins but don't crash
+    if (process.env.NODE_ENV === 'production') {
+      console.warn(`⚠️  CORS request from unauthorized origin: ${origin}`);
+      return callback(null, false);
+    }
+    
+    // In development, be more permissive
+    callback(null, true);
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  maxAge: 600 // Cache preflight for 10 minutes
 }));
 
 // Rate limiting
