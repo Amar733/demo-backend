@@ -34,7 +34,7 @@ const sendTokenResponse = (user, statusCode, res) => {
 // @route   POST /api/auth/register
 // @access  Public
 exports.register = catchAsync(async (req, res, next) => {
-  const { name, mobile,  password } = req.body;
+  const { name, mobile, password, role } = req.body;
 
   // Check if user already exists with this mobile number
   const existingUser = await User.findOne({ mobile });
@@ -42,11 +42,12 @@ exports.register = catchAsync(async (req, res, next) => {
     return next(new ErrorResponse('User already exists with this mobile number', 400));
   }
 
-  // Create user
+  // Create user with specified role (defaults to 'user' if not provided)
   const user = await User.create({
     name,
     mobile,
-    password
+    password,
+    role: role || 'user'
   });
 
   sendTokenResponse(user, 201, res);
