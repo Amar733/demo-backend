@@ -141,3 +141,16 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
   sendTokenResponse(user, 200, res);
 });
+
+// @desc    Get all users (Admin only)
+// @route   GET /api/auth/users
+// @access  Private/Admin
+exports.getUsers = catchAsync(async (req, res, next) => {
+  const users = await User.find().select('-password');
+
+  res.status(200).json({
+    success: true,
+    count: users.length,
+    data: users
+  });
+});

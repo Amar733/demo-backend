@@ -5,9 +5,10 @@ const {
   getMe,
   logout,
   updateProfile,
-  updatePassword
+  updatePassword,
+  getUsers
 } = require('../controllers/authController');
-const { protect } = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 const { registerValidation, loginValidation, validate } = require('../middleware/validators');
 
 const router = express.Router();
@@ -18,5 +19,8 @@ router.get('/me', protect, getMe);
 router.post('/logout', protect, logout);
 router.put('/updateprofile', protect, updateProfile);
 router.put('/updatepassword', protect, updatePassword);
+
+// Admin only routes
+router.get('/users', protect, authorize('admin'), getUsers);
 
 module.exports = router;
