@@ -5,12 +5,16 @@ const {
   addAddress,
   updateAddress,
   deleteAddress,
-  setDefaultAddress
+  setDefaultAddress,
+  getUserDetails
 } = require('../controllers/userController');
-const { protect } = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 
 // All routes require authentication
 router.use(protect);
+
+// Admin route to get detailed user info
+router.get('/:userId/details', authorize('admin'), getUserDetails);
 
 // Address routes
 router.route('/addresses')

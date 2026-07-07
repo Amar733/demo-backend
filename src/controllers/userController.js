@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Order = require('../models/Order');
 const { catchAsync } = require('../utils/catchAsync');
 const ErrorResponse = require('../utils/errorResponse');
 
@@ -173,5 +174,50 @@ exports.setDefaultAddress = catchAsync(async (req, res, next) => {
     success: true,
     message: 'Default address set successfully',
     data: address
+  });
+});
+
+// @desc    Get detailed user info with addresses and orders (Admin only)
+// @route   GET /api/users/:userId/details
+// @access  Private/Admin
+exports.getUserDetails = catchAsync(async (req, res, next) => {
+  const { userId } = req.params;
+
+  const user = await User.findById(userId).select('-password');
+  
+  if (!user) {
+    return next(new ErrorResponse('User not found', 404));
+  }
+
+  // Get user's orders
+  const orders = await Order.find({ user: userId })
+    .populate('items.product', 'name price image')
+    .sort('-createdAt')
+    .limit(50); // Limit to last 50 orders
+
+  // Calculate order statistics
+  const orderStats = {
+    total: orders.length,
+    pending: orders.filter(o => o.orderStatus === 'pending').length,
+    completed: orders.filter(o => o.orderStatus === 'delivered').length,
+    cancelled: orders.filter(o => o.orderStatus === 'cancelled').length,
+    totalSpent: orders.reduce((sum, o) => sum + (o.pricing?.totalAmount || 0), 0)
+  };
+
+  res.status(200).json({
+    success: true,
+    data: {
+      user: {
+        _id: user._id,
+        name: user.name,
+        mobile: user.mobile,
+        role: user.role,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+        addresses: user.addresses
+      },
+      orders,
+      orderStats
+    }
   });
 });
